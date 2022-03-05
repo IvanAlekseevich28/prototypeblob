@@ -4,12 +4,8 @@
 #include <memory>
 #include <thread>
 #include <list>
-#include <cstdlib>
-#include <cmath>
 #include <chrono>
 
-
-#include <unistd.h>
 
 const unsigned aLen = 1000000;
 using namespace std;
