@@ -8,6 +8,7 @@
 
 
 const unsigned aLen = 1000000;
+long long durationOneThread=0;
 using namespace std;
 
 struct Cell
@@ -218,6 +219,16 @@ private:
     list<PIEngine> m_engs;
 };
 
+double getEfficiency(long long duration, int nThreads)
+{
+    // for virtual cores
+    int mult = 1;
+    if (thread::hardware_concurrency() < nThreads*2)
+        mult = 2;
+
+    return (double)durationOneThread / duration / nThreads * mult;
+}
+
 void calcByCountThread(const int nThr, const int N)
 {
     MainEngine meng(nThr);
@@ -229,9 +240,14 @@ void calcByCountThread(const int nThr, const int N)
 
     auto t2 = std::chrono::high_resolution_clock::now();
 
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count();
+    long long duration = std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count();
+    double efficiency = 1.0;
+    if (nThr == 1)
+        durationOneThread = duration;
+    else
+        efficiency = getEfficiency(duration, nThr);
 
-    std::cout << duration / (10*N) << endl;
+    std::cout << setw(10) << duration / (1000) + 1 << " ms " << fixed << setprecision(1) << efficiency*100 << "%\n";
 }
 
 int main()
