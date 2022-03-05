@@ -119,11 +119,10 @@ public:
 };
 typedef unique_ptr<IEngine> PIEngine;
 
-void calcA(const ThreadInfo ti, const Field& in, Field& out)
+void calcA(const chankRng rng, const Field& in, Field& out)
 {
     const auto& inArr = in.arr;
 
-    const auto& rng = getRngOfThread(ti, in.arr.size());
     for (int i = rng.first; i < rng.second; i++)
     {
         auto &outA = out.arr[i].a;
@@ -135,11 +134,10 @@ void calcA(const ThreadInfo ti, const Field& in, Field& out)
         outA = sum / size;
     }
 }
-void calcB(const ThreadInfo ti, const Field& in, Field& out)
+void calcB(const chankRng rng, const Field& in, Field& out)
 {
     const auto& inArr = in.arr;
 
-    const auto& rng = getRngOfThread(ti, in.arr.size());
     for (int i = rng.first; i < rng.second; i++)
     {
         auto &outB = out.arr[i].b;
@@ -147,13 +145,14 @@ void calcB(const ThreadInfo ti, const Field& in, Field& out)
     }
 }
 
-using pFunCalc = void (*)(const ThreadInfo ti, const Field& in, Field& out);
+using pFunCalc = void (*)(const chankRng rng, const Field& in, Field& out);
 typedef std::list<pFunCalc> lstFunCalcs;
 
 void threadCalc(const lstFunCalcs& tasks, const ThreadInfo ti, const Field& in, Field& out)
 {
+    const auto rng = getRngOfThread(ti, in.arr.size());
     for (const auto task : tasks)
-        task(ti, in, out);
+        task(rng, in, out);
 }
 
 class ChankEngine : public IEngine
@@ -236,7 +235,7 @@ void calcByCountThread(const int nThr, const int N)
 
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count();
 
-    std::cout << duration / (100*N) << endl;
+    std::cout << duration / (10*N) << endl;
 }
 
 int main()
