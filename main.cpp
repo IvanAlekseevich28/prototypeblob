@@ -222,11 +222,10 @@ private:
 double getEfficiency(long long duration, int nThreads)
 {
     // for virtual cores
-    int mult = 1;
     if (thread::hardware_concurrency() < nThreads*2)
-        mult = 2;
+        nThreads = thread::hardware_concurrency() / 2;
 
-    return (double)durationOneThread / duration / nThreads * mult;
+    return (double)durationOneThread / duration / nThreads;
 }
 
 void calcByCountThread(const int nThr, const int N)
